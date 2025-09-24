@@ -52,9 +52,5 @@ int main(){
     uint16_t conv3 = htons(inicial3);
     uint16_t inv3 = ntohs(conv3);
     printf("Inicial:%x\tConversión:%x\tInversa:%x\n\n",inicial3,conv3,inv3);
-
-//3. USO DEL COMANDO DIG
-    printf("Host de la IPv4 173.194.203.190:" )
-    printf("Host de la IPv6 2607:f8b0:400e:c0d::5d:" )
 }
 
