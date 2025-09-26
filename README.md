@@ -53,7 +53,17 @@ O projeto contém os seguintes arquivos:
 
 ## Como compilar
 ```bash
-gcc -Wall -Wextra -O2 servidor.c -o servidor
+
+(#1) - terminal 1 
+(#2) - terminal 2 (receptor)
+
+1- sudo apt update (#1)
+2- sudo apt install netcat-openbsd (#1)
+3- gcc -Wall servidor.c -o servidor (#1)
+4- ./servidor 12345 (#1)
+5- nc 127.0.0.1 12345 (#2) * Ira receber a menssagem *
+
+
 gcc -Wall -Wextra -O2 cliente.c -o cliente
 gcc -Wall -Wextra -O2 servidormay.c -o servidormay
 gcc -Wall -Wextra -O2 clientemay.c -o clientemay
