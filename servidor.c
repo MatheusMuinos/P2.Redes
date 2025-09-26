@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
     if (puerto <= 0 || puerto > 65535) {
         fprintf(stderr, "Puerto inválido\n");
         exit(EXIT_FAILURE);
-    }q
+    }
 
     sockserv = socket(AF_INET, SOCK_STREAM, 0);
     if (sockserv < 0) {
