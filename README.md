@@ -3,30 +3,57 @@
 ## Objetivo
 Implementar programas cliente/servidor em C usando **TCP sockets**, entendendo o funcionamento de conexões, envio/recepção de dados e tratamento sequencial de múltiplos clientes.  
 
-## Estrutura
-O projeto contém os seguintes arquivos:
 
-- **servidor.c** – Servidor TCP básico que:
-  - Escuta em todas as interfaces na porta indicada por parâmetro.
-  - Aceita clientes sequencialmente.
-  - Imprime IP e porta do cliente.
-  - Envia uma mensagem de saudação (em duas chamadas `send()`).
+## Estrutura e funcionalidades dos arquivos
 
-- **cliente.c** – Cliente TCP básico que:
-  - Recebe IP e porta como parâmetros.
-  - Conecta ao servidor, aguarda opcionalmente (`sleep`).
-  - Lê a mensagem com `recv()` e imprime número de bytes e conteúdo.
+### servidor.c
+Servidor TCP básico:
+- Escuta em todas as interfaces na porta indicada por parâmetro.
+- Aceita clientes sequencialmente.
+- Imprime IP e porta do cliente.
+- Envia uma mensagem de saudação (em uma chamada `send()`).
 
-- **servidormay.c** – Servidor “maiúsculas” que:
-  - Recebe linhas de texto de um cliente.
-  - Converte cada linha em maiúsculas com `toupper()`.
-  - Retorna a linha convertida ao cliente.
+### cliente.c
+Cliente TCP básico:
+- Recebe IP e porta como parâmetros.
+- Conecta ao servidor, aguarda opcionalmente (`sleep`).
+- Lê a mensagem com `recv()` e imprime número de bytes e conteúdo.
 
-- **clientemay.c** – Cliente “maiúsculas” que:
-  - Recebe um arquivo de entrada, IP e porta como parâmetros.
-  - Envia o arquivo **linha a linha** ao servidor.
-  - Recebe o retorno em maiúsculas.
-  - Gera um arquivo de saída com **nome e extensão em maiúsculas**.
+### servidor2c.c
+Servidor modificado para experimentos:
+- Envia **duas mensagens** ao cliente usando duas chamadas `send()` (em vez de uma).
+- Permite testar se o cliente recebe ambas as mensagens em uma única chamada de `recv()`.
+- Funcionalidade extra para experimentos de fragmentação do fluxo TCP.
+
+### cliente2d.c
+Cliente modificado para experimentos:
+- Remove o `sleep` antes de receber.
+- Usa um **laço while** com `recv()` para receber dados em blocos de tamanho configurável (por exemplo, 5 ou 10 bytes).
+- Imprime cada bloco recebido e o total de bytes.
+- Permite observar como o TCP entrega os dados em partes, dependendo do buffer e do tempo de envio.
+
+### servidormay.c
+Servidor “maiúsculas”:
+- Recebe linhas de texto de um cliente.
+- Converte cada linha em maiúsculas com `toupper()`.
+- Retorna a linha convertida ao cliente.
+
+### clientemay.c
+Cliente “maiúsculas”:
+- Recebe um arquivo de entrada, IP e porta como parâmetros.
+- Envia o arquivo **linha a linha** ao servidor.
+- Recebe o retorno em maiúsculas.
+- Gera um arquivo de saída com **nome e extensão em maiúsculas**.
+
+### p1.c
+Exemplo de manipulação de endereços IP e conversão de ordem de bytes:
+- Demonstra uso de `inet_pton`, `inet_ntop`, `htons`, `ntohs`.
+- Não é um cliente/servidor, mas serve para estudo das funções de rede.
+
+## Diferenças entre os arquivos originais e os de experimento
+
+- **servidor2c.c** vs **servidor.c**: O servidor2c.c envia duas mensagens separadas com `send()`, enquanto o servidor.c envia tudo em uma só. Isso permite testar como o cliente recebe dados fragmentados.
+- **cliente2d.c** vs **cliente.c**: O cliente2d.c recebe dados em laço, com blocos de tamanho configurável, e imprime cada bloco. O cliente.c recebe tudo em uma chamada e imprime o resultado final. O cliente2d.c permite observar a fragmentação do fluxo TCP.
 
 ## Experimentos
 1. **Dois `send()` vs. um `recv()`**  
