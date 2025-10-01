@@ -53,17 +53,42 @@ O projeto contém os seguintes arquivos:
 
 ## Como compilar
 ```bash
-
-(#1) - terminal 1 
-(#2) - terminal 2 (receptor)
-
-1- sudo apt update (#1)
-2- sudo apt install netcat-openbsd (#1)
-3- gcc -Wall servidor.c -o servidor (#1)
-4- ./servidor 12345 (#1)
-5- nc 127.0.0.1 12345 (#2) * Ira receber a menssagem *
-
-
+gcc -Wall -Wextra -O2 servidor.c -o servidor
 gcc -Wall -Wextra -O2 cliente.c -o cliente
 gcc -Wall -Wextra -O2 servidormay.c -o servidormay
 gcc -Wall -Wextra -O2 clientemay.c -o clientemay
+```
+
+## Como testar apenas o servidor (usando netcat)
+
+### Passos:
+1. Abra o terminal 1 e execute:
+  ```bash
+  sudo apt update
+  sudo apt install netcat-openbsd
+  gcc -Wall servidor.c -o servidor
+  ./servidor 12345
+  ```
+2. Abra o terminal 2 e execute:
+  ```bash
+  nc 127.0.0.1 12345
+  # Você verá a mensagem enviada pelo servidor
+  ```
+
+## Como testar servidor e cliente em C
+
+### Passos:
+1. Compile ambos:
+  ```bash
+  gcc -Wall servidor.c -o servidor
+  gcc -Wall cliente.c -o cliente
+  ```
+2. Abra o terminal 1 e execute:
+  ```bash
+  ./servidor 12345
+  ```
+3. Abra o terminal 2 e execute:
+  ```bash
+  ./cliente 127.0.0.1 12345
+  # O cliente mostrará a mensagem recebida e o número de bytes
+  ```
