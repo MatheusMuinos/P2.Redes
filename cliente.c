@@ -17,8 +17,8 @@ int main(int argc, char *argv[]){
     }
     
     int puerto = atoi(argv[2]);
-    char* ip = argv[1];
-    int sockclient;
+    char* ip = argv[1],;
+    int sockclient,bit;
     struct sockaddr_in sockstruct_client;
     char mensaje[1000];
 
@@ -37,15 +37,18 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    sleep(1); //Espera para que el servidor envíe los 2 mensajes
-    int bit = recv(sockclient, mensaje, sizeof(mensaje)-1,0);
-    if( bit < 0){
-        perror("No se pudo recibir el mensaje\n");
-        exit(EXIT_FAILURE);
-    }
+    //sleep(1); //Espera para que el servidor envíe los 2 mensajes
 
-    printf("%s\n",mensaje);
-    printf("%d bytes\n",bit);
+    while((bit = recv(sockclient, mensaje, sizeof(mensaje)-1,0)) > 0){
+        if( bit < 0){
+            perror("No se pudo recibir el mensaje\n");
+            exit(EXIT_FAILURE);
+        }
+
+        printf("%s\n",mensaje);
+        printf("%d bytes\n",bit);
+    }
+    
 
     close(sockclient);
     return(EXIT_SUCCESS);
