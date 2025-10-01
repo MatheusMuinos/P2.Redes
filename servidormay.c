@@ -32,4 +32,33 @@ int main(int argc, char *argv[]){
         perror("No se pudo crear el socket");
         exit(EXIT_FAILURE);
     }
+
+    if(bind(sockserv,(struct sockaddr*) &sockstruct_serv, sizeof(sockstruct_serv)) < 0){ //Asignación de dirección al socket de servidor, guardada en la estructura del servidor.
+        perror("No se pudo asignar dirección");
+        exit(EXIT_FAILURE);
+    }
+
+    if(listen(sockserv,5) < 0){ //Marca el socket como pasivo.
+        perror("Error de listen");
+        exit(EXIT_FAILURE);
+    }
+
+    while(1){ //loop infinito para aceptar conexiones secuenciales
+        if((sockcon = accept(sockserv, (struct sockaddr*)&sockstruct_con, &con_len)) < 0 ){ //Acepta la conexión del cliente y devuelve un socket de conexión.
+            perror("No se pudo aceptar la conexion");
+            continue;
+        }
+
+        char ip_cliente[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &sockstruct_con.sin_addr,ip_cliente,sizeof(ip_cliente)); //Guarda en ip_cliente la dirección IP.
+        int puerto_cliente = ntohs(sockstruct_con.sin_port); //Guarda el puerto, convertido de red a host.
+
+        printf("IP:%s\tPuerto:%d\n",ip_cliente,puerto_cliente);
+
+        send(sockcon,saludo,strlen(saludo),0);  //Envía un mensaje a los clientes que se conecten.
+        send(sockcon,mensaje2,strlen(mensaje2),0);
+    }
+
+    close(sockserv);
+    return (EXIT_SUCCESS);
 }

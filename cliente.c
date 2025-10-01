@@ -39,7 +39,7 @@ int main(int argc, char *argv[]){
 
     //sleep(1); //Espera para que el servidor envíe los 2 mensajes
 
-    while((bit = recv(sockclient, mensaje, sizeof(mensaje)-1,0)) > 0){
+    while((bit = recv(sockclient, mensaje, 20,0)) > 0){ //Recibe mensajes hasta que el número de bytes sea 0, que es cuando el servidor finalice la conexión.
         if( bit < 0){
             perror("No se pudo recibir el mensaje\n");
             exit(EXIT_FAILURE);
