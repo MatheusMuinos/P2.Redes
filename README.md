@@ -1,69 +1,175 @@
-# Prática TCP – Cliente/Servidor em C
+# TCP Practice – Client/Server in C
 
-## Objetivo
-Implementar programas cliente/servidor em C usando **TCP sockets**, entendendo o funcionamento de conexões, envio/recepção de dados e tratamento sequencial de múltiplos clientes.  
+## Objective
+Implement client/server programs in C using **TCP sockets**, understanding how connections, data sending/receiving, and sequential handling of multiple clients work.
 
-## Estrutura
-O projeto contém os seguintes arquivos:
+## Structure and functionalities of the files
 
-- **servidor.c** – Servidor TCP básico que:
-  - Escuta em todas as interfaces na porta indicada por parâmetro.
-  - Aceita clientes sequencialmente.
-  - Imprime IP e porta do cliente.
-  - Envia uma mensagem de saudação (em duas chamadas `send()`).
+### servidor.c
+Basic TCP server:
+- Listens on all interfaces at the port given as a parameter.
+- Handles clients sequentially.
+- Prints the client's IP and port.
+- Sends a greeting message (in a single `send()` call).
 
-- **cliente.c** – Cliente TCP básico que:
-  - Recebe IP e porta como parâmetros.
-  - Conecta ao servidor, aguarda opcionalmente (`sleep`).
-  - Lê a mensagem com `recv()` e imprime número de bytes e conteúdo.
+### cliente.c
+Basic TCP client:
+- Receives IP and port as parameters.
+- Connects to the server, optionally waits (`sleep`).
+- Reads the message with `recv()` and prints the number of bytes and content.
 
-- **servidormay.c** – Servidor “maiúsculas” que:
-  - Recebe linhas de texto de um cliente.
-  - Converte cada linha em maiúsculas com `toupper()`.
-  - Retorna a linha convertida ao cliente.
+### servidor2c.c
+Server modified for experiments:
+- Sends **two messages** to the client using two `send()` calls (instead of one).
+- Allows testing if the client receives both messages in a single `recv()` call.
+- Extra functionality for TCP stream fragmentation experiments.
 
-- **clientemay.c** – Cliente “maiúsculas” que:
-  - Recebe um arquivo de entrada, IP e porta como parâmetros.
-  - Envia o arquivo **linha a linha** ao servidor.
-  - Recebe o retorno em maiúsculas.
-  - Gera um arquivo de saída com **nome e extensão em maiúsculas**.
+### cliente2d.c
+Client modified for experiments:
+- Removes the `sleep` before receiving.
+- Uses a **while loop** with `recv()` to receive data in blocks of configurable size (e.g., 5 or 10 bytes).
+- Prints each block received and the total bytes.
+- Allows observing how TCP delivers data in parts, depending on the buffer and sending timing.
 
-## Experimentos
-1. **Dois `send()` vs. um `recv()`**  
-   - Com `sleep`: cliente normalmente recebe os dois envios juntos.  
-   - Sem `sleep`: cliente pode receber apenas parte da mensagem.  
-   - **Conclusão:** TCP é fluxo de bytes, não de mensagens.
+### servidormay.c
+Uppercase server:
+- Receives text lines from a client.
+- Converts each line to uppercase with `toupper()`.
+- Returns the converted line to the client.
 
-2. **Uso de `while(recv() > 0)`**  
-   - O cliente processa o fluxo em blocos do tamanho do buffer (`5`, `10`, etc.).  
-   - O loop termina quando `recv` retorna **0** (o servidor fechou a conexão).
+### clientemay.c
+Uppercase client:
+- Receives an input file name, server IP, and port as parameters.
+- Sends the file **line by line** to the server.
+- Receives the response in uppercase.
+- Generates an output file with **name and extension in uppercase**.
 
-3. **Servidor de maiúsculas com múltiplos clientes**  
-   - Atende clientes **sequencialmente**.  
-   - Se dois clientes conectam, o segundo aguarda até o primeiro terminar.
+### p1.c
+Example of IP address manipulation and byte order conversion:
+- Demonstrates usage of `inet_pton`, `inet_ntop`, `htons`, `ntohs`.
+- Not a client/server, but for studying network functions.
 
-## Requisitos cumpridos
-- Uso apenas de funções vistas em aula (`getaddrinfo`, `getnameinfo`, `recv`, `send`, etc.).  
-- Suporte a linhas de até **1000 caracteres**.  
-- Verificação de erros em todas as chamadas.  
-- Tratamento robusto de entradas inválidas.  
-- Memória e descritores liberados corretamente.  
-- Código comentado, formatado e compilado sem *warnings* com `-Wall`.  
-- Programas funcionam em máquinas diferentes (captura de tela incluída).  
+## Differences between original and experimental files
 
-## Como compilar
+- **servidor2c.c** vs **servidor.c**: servidor2c.c sends two separate messages with `send()`, while servidor.c sends everything in one. This allows testing how the client receives fragmented data.
+- **cliente2d.c** vs **cliente.c**: cliente2d.c receives data in a loop, with configurable block size, and prints each block. cliente.c receives everything in one call and prints the final result. cliente2d.c allows observing TCP stream fragmentation.
+
+## Experiments
+1. **Two `send()` vs. one `recv()`**  
+  - With `sleep`: client usually receives both sends together.  
+  - Without `sleep`: client may receive only part of the message.  
+  - **Conclusion:** TCP is a byte stream, not a message protocol.
+
+2. **Using `while(recv() > 0)`**  
+  - The client processes the stream in blocks of buffer size (`5`, `10`, etc.).  
+  - The loop ends when `recv` returns **0** (server closed the connection).
+
+3. **Uppercase server with multiple clients**  
+  - Handles clients **sequentially**.  
+  - If two clients connect, the second waits until the first finishes.
+
+## Requirements met
+- Only uses functions covered in class (`getaddrinfo`, `getnameinfo`, `recv`, `send`, etc.).
+- Supports lines up to **1000 characters**.
+- Error checking in all calls.
+- Robust handling of invalid input.
+- Memory and descriptors properly released.
+- Code commented, formatted, and compiles without *warnings* using `-Wall`.
+- Programs work on different machines (screenshot included).
+
+## How to compile
 ```bash
-
-(#1) - terminal 1 
-(#2) - terminal 2 (receptor)
-
-1- sudo apt update (#1)
-2- sudo apt install netcat-openbsd (#1)
-3- gcc -Wall servidor.c -o servidor (#1)
-4- ./servidor 12345 (#1)
-5- nc 127.0.0.1 12345 (#2) * Ira receber a menssagem *
-
-
+gcc -Wall -Wextra -O2 servidor.c -o servidor
 gcc -Wall -Wextra -O2 cliente.c -o cliente
+gcc -Wall -Wextra -O2 servidor2c.c -o servidor2c
+gcc -Wall -Wextra -O2 cliente2d.c -o cliente2d
 gcc -Wall -Wextra -O2 servidormay.c -o servidormay
 gcc -Wall -Wextra -O2 clientemay.c -o clientemay
+gcc -Wall -Wextra -O2 p1.c -o p1
+```
+
+## How to test each file
+
+### 1. Basic TCP server and client (`servidor.c` and `cliente.c`)
+
+**Step by step:**
+1. Open terminal 1 and run:
+  ```bash
+  ./servidor 12345
+  ```
+2. Open terminal 2 and run:
+  ```bash
+  ./cliente 127.0.0.1 12345
+  ```
+**Expected:**
+- The server prints the client's IP and port, and sends a greeting message.
+- The client prints the received message and the number of bytes.
+
+### 2. TCP server and client with fragmentation experiment (`servidor2c.c` and `cliente2d.c`)
+
+**Step by step:**
+1. Open terminal 1 and run:
+  ```bash
+  ./servidor2c 12345
+  ```
+2. Open terminal 2 and run:
+  ```bash
+  ./cliente2d 127.0.0.1 12345
+  ```
+  You can edit `cliente2d.c` to change the buffer size (e.g., 5, 10, 20) for each test.
+**Expected:**
+- The server sends two messages with two `send()` calls.
+- The client receives data in blocks and prints each block and the total bytes received.
+- You can observe how TCP delivers data in parts depending on buffer size and timing.
+
+### 3. Uppercase server and client (`servidormay.c` and `clientemay.c`)
+
+**Step by step:**
+1. Prepare a text file for testing, for example:
+  ```bash
+  echo "test line" > INPUT.TXT
+  ```
+2. Open terminal 1 and run:
+  ```bash
+  ./servidormay 12345
+  ```
+3. Open terminal 2 and run:
+  ```bash
+  ./clientemay INPUT.TXT 127.0.0.1 12345
+  ```
+**Expected:**
+- The server prints the client's IP and port.
+- The client reads each line from the input file, sends it to the server, receives the line converted to uppercase, and saves it in the output file (with the name in uppercase, e.g., INPUT.TXT).
+- At the end, the client prints: `Converted file saved as: INPUT.TXT`
+- The output file contains all lines from the original file, but in uppercase.
+
+### 4. IP and byte order manipulation example (`p1.c`)
+
+**Step by step:**
+1. Run:
+  ```bash
+  ./p1
+  ```
+**Expected:**
+- The program prints examples of IP address conversion between string and binary formats, and byte order conversions using `htons` and `ntohs`.
+- Useful for understanding how network functions work in C.
+
+### 5. Testing the server with netcat (alternative to the client in C)
+
+**Step by step:**
+1. Install netcat if needed:
+  ```bash
+  sudo apt update
+  sudo apt install netcat-openbsd
+  ```
+2. Open terminal 1 and run:
+  ```bash
+  ./servidor 12345
+  ```
+3. Open terminal 2 and run:
+  ```bash
+  nc 127.0.0.1 12345
+  ```
+**Expected:**
+- The server prints the client's IP and port.
+- The netcat client displays the greeting message sent by the server.

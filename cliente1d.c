@@ -19,6 +19,9 @@ int main(int argc, char *argv[]){
     int puerto = atoi(argv[2]);
     char* ip = argv[1];
     int sockclient;
+    int n;
+    int total = 0;
+    int tamano_mensaje = 5;
     struct sockaddr_in sockstruct_client;
     char mensaje[1000];
 
@@ -37,15 +40,12 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    sleep(1); //Espera para que el servidor envíe los 2 mensajes
-    int bit = recv(sockclient, mensaje, sizeof(mensaje)-1,0);
-    if( bit < 0){
-        perror("No se pudo recibir el mensaje\n");
-        exit(EXIT_FAILURE);
+    while ((n = recv(sockclient, mensaje, tamano_mensaje, 0)) > 0) {
+        mensaje[n] = '\0'; // Asegura que el string esté terminado
+        printf("Recibido: '%s' (%d bytes)\n", mensaje, n);
+        total += n;
     }
-
-    printf("%s\n",mensaje);
-    printf("%d bytes\n",bit);
+    printf("Total de bytes recibidos: %d\n", total);
 
     close(sockclient);
     return(EXIT_SUCCESS);
