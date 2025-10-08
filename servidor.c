@@ -16,10 +16,10 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
     
-    int puerto = atoi(argv[1]);
-    int sockserv, sockcon;
+    int puerto = atoi(argv[1]);  //Toma el argumento como puerto
+    int sockserv, sockcon;  //Socket de servidor y socket de accept.
     struct sockaddr_in sockstruct_serv, sockstruct_con;
-    char* saludo = "Hola, cliente!\n";
+    char* saludo = "Hola, cliente!\n";  //Mensajes de bienvenida
     char* mensaje2 = "¿Cómo encontraste este puerto?";
     socklen_t con_len = sizeof(sockstruct_con);
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    while(1){ //loop infinito para aceptar conexiones secuenciales
+    do{ //loop para aceptar conexiones secuenciales hasta recibir nueva linea (Enter)
         if((sockcon = accept(sockserv, (struct sockaddr*)&sockstruct_con, &con_len)) < 0 ){ //Acepta la conexión del cliente y devuelve un socket de conexión.
             perror("No se pudo aceptar la conexion");
             continue;
@@ -57,7 +57,7 @@ int main(int argc, char *argv[]){
 
         send(sockcon,saludo,strlen(saludo),0);  //Envía un mensaje a los clientes que se conecten.
         send(sockcon,mensaje2,strlen(mensaje2),0);
-    }
+    }while(getchar() != '\n');
 
     close(sockserv);
     return (EXIT_SUCCESS);

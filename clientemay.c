@@ -9,13 +9,6 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
-void _strip_line(char *linea) {
-    if (linea) {
-        linea[strcspn(linea, "\r\n")] = '\0';
-    }
-}
-
-
 int main(int argc, char *argv[]){
     if (argc != 4) { //El programa debe recibir 3 argumentos de entrada, siendo el primero el archivo, el segundo la IP y el tercero el puerto.
         printf("Falta el argumento de archivo, IP o Puerto\n");
@@ -30,14 +23,17 @@ int main(int argc, char *argv[]){
     struct sockaddr_in sockstruct_client;
     char mensaje[1000],linea[1000];
 
-    FILE* file = fopen(archivo,"r");
-    if (file == NULL) {
+    FILE* fileinput = fopen(archivo,"r+");  //Archivo de entrada
+    if (fileinput == NULL) {
         printf("Error!\n");
         return 1;
     }
 
-
-
+    FILE* fileout = fopen("MAYUSCULA.txt","w");  //Archivo de salida
+    if (fileout == NULL) {
+        printf("Error!\n");
+        return 1;
+    }
     
     if((sockclient = socket(AF_INET, SOCK_STREAM, 0)) < 0){ //Creación de un socket IPv4 orientado a TCP.
         perror("No se pudo crear el socket\n");
@@ -53,27 +49,34 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    //sleep(1); //Espera para que el servidor envíe los 2 mensajes
+    
+    while(fgets(linea,sizeof(linea),fileinput)){
+        sleep(1);
+        printf("Linea leida: %s\n",linea);
 
-    do{
-        linea = fgets(linea,sizeof(linea),stdin);
-
+        send(sockclient,linea,strlen(linea),0);
         
-
-        if(bit = recv(sockclient, mensaje, sizeof(mensaje), 0)){ 
+       
+        bit = recv(sockclient, mensaje, sizeof(mensaje), 0);
         if( bit < 0){
             perror("No se pudo recibir el mensaje\n");
             exit(EXIT_FAILURE);
         }
-    }
 
-    } while(linea != NULL);
+        mensaje[bit] = '\0';
+        printf("Mensaje recibido: %s\n",mensaje);
+        
+        fprintf(fileout,"%s",mensaje);
+        fflush(fileout);
+
+    }
     
     
-    printf("%s\n",mensaje);
-    printf("%d bytes\n",bit);
     
-    fclose(file);
+
+    
+    fclose(fileinput);
+    fclose(fileout);
     close(sockclient);
     return(EXIT_SUCCESS);
 }

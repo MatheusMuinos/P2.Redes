@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
     }
     
     int puerto = atoi(argv[2]);
-    char* ip = argv[1],;
+    char* ip = argv[1];
     int sockclient,bit;
     struct sockaddr_in sockstruct_client;
     char mensaje[1000];
