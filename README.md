@@ -145,6 +145,37 @@ gcc -Wall -Wextra -O2 p1.c -o p1
 
 ---
 
+### Experiment: Sequential clients with sleep in clientemay.c
+
+To verify that the server attends multiple clients sequentially, you can add a `sleep()` inside the loop of `clientemay.c` (after writing each line to the output file). This gives you time to launch a second client in another terminal while the first client is still running.
+
+**How to do it:**
+1. In `clientemay.c`, add `sleep(10);` after `fputs(resposta, fout);` inside the main loop.
+2. Compile the client again:
+  ```bash
+  gcc -Wall -Wextra -O2 clientemay.c -o clientemay
+  ```
+3. Start the server:
+  ```bash
+  ./servidormay 12345
+  ```
+4. In one terminal, run the first client:
+  ```bash
+  ./clientemay teste.txt 127.0.0.1 12345
+  ```
+5. While the first client is sleeping (between lines), open another terminal and run the second client:
+  ```bash
+  ./clientemay teste2.txt 127.0.0.1 12345
+  ```
+
+**What happens:**
+- The server accepts the first client and processes its lines one by one, waiting 10 seconds between each line.
+- The second client will try to connect, but will have to wait until the first client finishes and disconnects.
+- Only after the first client closes the connection, the server will accept and process the second client.
+- This demonstrates that the server handles clients sequentially: one at a time, in the order they connect.
+
+---
+
 ## servidormay.c
 **Functionality:**
 - TCP server that receives text lines from a client, converts each line to uppercase, and sends it back.

@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
 		}
 		resposta[n] = '\0';
 		fputs(resposta, fout);
+		sleep(10); // Espera 10 segundos para ler cada linha
 	}
 
 	fclose(fin);
