@@ -143,6 +143,47 @@ gcc -Wall -Wextra -O2 p1.c -o p1
 - At the end, the client prints: `Converted file saved as: INPUT.TXT`
 - The output file contains all lines from the original file, but in uppercase.
 
+---
+
+## servidormay.c
+**Functionality:**
+- TCP server that receives text lines from a client, converts each line to uppercase, and sends it back.
+- Handles one client at a time (sequentially).
+- Prints the IP and port of each connected client.
+- Usage:
+  ```bash
+  ./servidormay <port>
+  ```
+  Example:
+  ```bash
+  ./servidormay 12345
+  ```
+
+## clientemay.c
+**Functionality:**
+- TCP client that reads lines from an input file, sends each line to the server, receives the uppercase version, and writes it to an output file (with the name in uppercase).
+- Prints the name of the output file when finished.
+- Usage:
+  ```bash
+  ./clientemay <input_file> <server_ip> <port>
+  ```
+  Example:
+  ```bash
+  ./clientemay teste.txt 127.0.0.1 12345
+  ```
+
+**How to run:**
+1. Start the server in one terminal:
+   ```bash
+   ./servidormay 12345
+   ```
+2. In another terminal, run the client with a text file:
+   ```bash
+   ./clientemay teste.txt 127.0.0.1 12345
+   ```
+3. The client will create an output file named TESTE.TXT (uppercase), containing the uppercase version of each line from the input file.
+4. The server will display connection information for each client.
+
 ### 4. IP and byte order manipulation example (`p1.c`)
 
 **Step by step:**
