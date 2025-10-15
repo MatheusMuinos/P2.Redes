@@ -79,13 +79,12 @@ Example of IP address manipulation and byte order conversion:
 
 ## How to compile
 ```bash
-gcc -Wall -Wextra -O2 servidor.c -o servidor
-gcc -Wall -Wextra -O2 cliente.c -o cliente
-gcc -Wall -Wextra -O2 servidor2c.c -o servidor2c
-gcc -Wall -Wextra -O2 cliente2d.c -o cliente2d
-gcc -Wall -Wextra -O2 servidormay.c -o servidormay
-gcc -Wall -Wextra -O2 clientemay.c -o clientemay
-gcc -Wall -Wextra -O2 p1.c -o p1
+gcc servidor.c -o servidor
+gcc cliente.c -o cliente
+gcc servidor2c.c -o servidor2c
+gcc cliente2d.c -o cliente2d
+gcc servidormay.c -o servidormay
+gcc clientemay.c -o clientemay
 ```
 
 ## How to test each file
