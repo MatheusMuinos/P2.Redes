@@ -37,15 +37,18 @@ int main(int argc, char *argv[]){
         exit(EXIT_FAILURE);
     }
 
-    sleep(1); //Espera para que el servidor envíe los 2 mensajes
-    int bit = recv(sockclient, mensaje, sizeof(mensaje)-1,0);
-    if( bit < 0){
+    sleep(1); // espera breve para que el servidor envíe ambos mensajes (si sacamos este sleep, a veces no alcanza a recibir el segundo mensaje)
+
+    int bit = recv(sockclient, mensaje, sizeof(mensaje)-1, 0);
+    if (bit < 0){
         perror("No se pudo recibir el mensaje\n");
         exit(EXIT_FAILURE);
     }
 
-    printf("%s\n",mensaje);
-    printf("%d bytes\n",bit);
+    mensaje[bit] = '\0'; // terminar la cadena recibida
+
+    printf("%s", mensaje);
+    printf("%d bytes\n", bit);
 
     close(sockclient);
     return(EXIT_SUCCESS);
