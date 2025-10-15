@@ -17,6 +17,19 @@ void nome_maiusculo(const char *orig, char *dest) {
 	dest[i] = '\0';
 }
 
+static void build_output_name(const char *in, char *out, size_t outsz) {
+    const char *dot = strrchr(in, '.');
+    if (!dot) {
+        snprintf(out, outsz, "%s_MAYUS", in);
+    } else {
+        size_t base = (size_t)(dot - in);
+        if (base >= outsz) base = outsz - 1;
+        memcpy(out, in, base);
+        out[base] = '\0';
+        snprintf(out + base, outsz - base, "_MAYUS%s", dot);
+    }
+}
+
 int main(int argc, char *argv[]) {
 	if (argc != 4) {
 		fprintf(stderr, "Uso: %s <arquivo_entrada> <ip_servidor> <puerto>\n", argv[0]);
@@ -35,8 +48,9 @@ int main(int argc, char *argv[]) {
 		perror("Erro ao abrir arquivo de entrada");
 		exit(EXIT_FAILURE);
 	}
-	char nome_saida[256];
-	nome_maiusculo(nome_entrada, nome_saida);
+	char nome_saida[512];
+	// nome_maiusculo(nome_entrada, nome_saida); // evita: sobrescreve no NTFS
+	build_output_name(nome_entrada, nome_saida, sizeof(nome_saida));
 	FILE *fout = fopen(nome_saida, "w");
 	if (!fout) {
 		perror("Erro ao abrir arquivo de saída");
@@ -75,7 +89,7 @@ int main(int argc, char *argv[]) {
 		}
 		resposta[n] = '\0';
 		fputs(resposta, fout);
-		sleep(10); // Espera 10 segundos para ler cada linha
+		// sleep(10); // remover a espera longa para testar mais rápido
 	}
 
 	fclose(fin);

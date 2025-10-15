@@ -50,7 +50,8 @@ int main(int argc, char *argv[]) {
 		}
 		char ip_cliente[INET_ADDRSTRLEN];
 		if (inet_ntop(AF_INET, &dircon.sin_addr, ip_cliente, sizeof(ip_cliente)) != NULL) {
-			printf("Conexión de %s:%d\n", ip_cliente, ntohs(dircon.sin_port));
+			printf("\nConexión de %s\n", ip_cliente);
+			printf("Puerto Cliente: %d\n", ntohs(dircon.sin_port));
 		}
 
 		char buffer[1001];
