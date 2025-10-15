@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
 #include "funciones.c"
 
 int main(int argc, char *argv[]) {
@@ -50,30 +52,36 @@ int main(int argc, char *argv[]) {
     }
     printf("Socket marcado como pasivo, escuchando conexiones...\n");
 
-    tamdir = sizeof(struct sockaddr_in);
-    sockcon = accept(sockserv, (struct sockaddr *)&dircon, &tamdir);
-    if (sockcon < 0) {
-        perror("Error en accept");
-        exit(EXIT_FAILURE);
-    }
-    printf("Conexion aceptada\n");
+    // Bucle para atender clientes secuencialmente
+    for (;;) {
+        tamdir = sizeof(struct sockaddr_in);
+        sockcon = accept(sockserv, (struct sockaddr *)&dircon, &tamdir);
+        if (sockcon < 0) {
+            perror("Error en accept");
+            continue; // sigue esperando otros clientes
+        }
+        printf("\nConexion aceptada\n");
 
-    char ip_cliente[INET_ADDRSTRLEN];
-    if (inet_ntop(AF_INET, &dircon.sin_addr, ip_cliente, sizeof(ip_cliente)) != NULL) {
-        printf("Conexion desde IP: %s, Puerto: %d\n", ip_cliente, ntohs(dircon.sin_port));
-    } else {
-        perror("Error al convertir la direccion IP");
+        char ip_cliente[INET_ADDRSTRLEN];
+        if (inet_ntop(AF_INET, &dircon.sin_addr, ip_cliente, sizeof(ip_cliente)) != NULL) {
+            printf("Conexion desde IP: %s, Puerto: %d\n", ip_cliente, ntohs(dircon.sin_port));
+        } else {
+            perror("Error al convertir la direccion IP");
+        }
+
+        const char *mensaje = "Hola, cliente!\n";
+        ssize_t bytes_enviados = send(sockcon, mensaje, strlen(mensaje), 0);
+        if (bytes_enviados < 0) {
+            perror("Error al enviar el mensaje");
+        } else {
+            printf("Mensaje enviado (%zd bytes)\n", bytes_enviados);
+        }
+
+        close(sockcon);
+        printf("Conexion con cliente cerrada. Esperando otro cliente...\n");
+
     }
 
-    const char *mensaje = "Hola, cliente!\n";
-    ssize_t bytes_enviados = send(sockcon, mensaje, strlen(mensaje), 0);
-    if (bytes_enviados < 0) {
-        perror("Error al enviar el mensaje");
-    } else {
-        printf("Mensaje enviado (%zd bytes)\n", bytes_enviados);
-    }
-
-    close(sockcon);
     close(sockserv);
 
 }

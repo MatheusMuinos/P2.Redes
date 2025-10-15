@@ -7,6 +7,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <sys/types.h>
+#include <string.h>
+#include <unistd.h>
 #include "funciones.c"
 
 int main(int argc, char *argv[]) {
@@ -50,32 +52,51 @@ int main(int argc, char *argv[]) {
     }
     printf("Socket marcado como pasivo, escuchando conexiones...\n");
 
-    tamdir = sizeof(struct sockaddr_in);
-    sockcon = accept(sockserv, (struct sockaddr *)&dircon, &tamdir);
-    if (sockcon < 0) {
-        perror("Error en accept");
-        exit(EXIT_FAILURE);
-    }
-    printf("Conexion aceptada\n");
+    // Bucle para atender clientes secuencialmente
+    for (;;) {
+        tamdir = sizeof(struct sockaddr_in);
+        sockcon = accept(sockserv, (struct sockaddr *)&dircon, &tamdir);
+        if (sockcon < 0) {
+            perror("Error en accept");
+            continue; // sigue esperando otros clientes
+        }
+        printf("\nConexion aceptada\n");
 
-    char ip_cliente[INET_ADDRSTRLEN];
-    if (inet_ntop(AF_INET, &dircon.sin_addr, ip_cliente, sizeof(ip_cliente)) != NULL) {
-        printf("Conexion desde IP: %s, Puerto: %d\n", ip_cliente, ntohs(dircon.sin_port));
-    } else {
-        perror("Error al convertir la direccion IP");
+        char ip_cliente[INET_ADDRSTRLEN];
+        if (inet_ntop(AF_INET, &dircon.sin_addr, ip_cliente, sizeof(ip_cliente)) != NULL) {
+            printf("Conexion desde IP: %s, Puerto: %d\n", ip_cliente, ntohs(dircon.sin_port));
+        } else {
+            perror("Error al convertir la direccion IP");
+        }
+
+        // Enviar DOS mensajes con send()
+        const char *m1 = "Hola, ";
+        const char *m2 = "cliente!\n";
+
+        ssize_t b1 = send(sockcon, m1, strlen(m1), 0);
+        // Pausa opcional para experimentar fragmentación/reensamblado:
+        // usleep(100000); // 100 ms
+
+        ssize_t b2 = send(sockcon, m2, strlen(m2), 0);
+        if (b1 < 0) {
+            perror("Error al enviar m1");
+        } else {
+            printf("Mensaje 1 enviado (%zd bytes)\n", b1);
+        }
+
+        if (b2 < 0) {
+            perror("Error al enviar m2");
+        } else {
+            printf("Mensaje 2 enviado (%zd bytes)\n", b2);
+        }
+
+        printf("Total enviado: %zd bytes\n", (b1 > 0 ? b1 : 0) + (b2 > 0 ? b2 : 0));
+
+        close(sockcon);
+        printf("Conexion con cliente cerrada. Esperando otro cliente...\n");
+
     }
 
-    const char *msg1 = "Hola, ";
-    const char *msg2 = "cliente!\n";
-    ssize_t bytes_enviados1 = send(sockcon, msg1, strlen(msg1), 0);
-    ssize_t bytes_enviados2 = send(sockcon, msg2, strlen(msg2), 0);
-    if (bytes_enviados1 < 0 || bytes_enviados2 < 0) {
-        perror("Error al enviar el mensaje");
-    } else {
-        printf("Mensaje enviado (%zd bytes)\n", bytes_enviados1 + bytes_enviados2);
-    }
-
-    close(sockcon);
     close(sockserv);
 
 }
